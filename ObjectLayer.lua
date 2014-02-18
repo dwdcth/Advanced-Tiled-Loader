@@ -15,7 +15,6 @@ ObjectLayer.__index = ObjectLayer
 ---------------------------------------------------------------------------------------------------
 -- Creates and returns a new ObjectLayer
 function ObjectLayer:new(map, name, color, opacity, prop)
-    
     -- Create a new table for our object layer and do some error checking.
     local layer = setmetatable({}, ObjectLayer)
     
@@ -24,6 +23,7 @@ function ObjectLayer:new(map, name, color, opacity, prop)
     layer.color = color or grey                 -- The color theme
     layer.opacity = opacity or 1                -- The opacity
     layer.objects = {}                          -- The layer's objects indexed numerically
+    layer.objIndex={}
     layer.properties = prop or {}               -- Properties set by Tiled.
     layer.visible = true                        -- If false then the layer will not be drawn
     
@@ -110,7 +110,40 @@ function ObjectLayer:toCustomLayer(convert)
     self.class = "CustomLayer"
     return setmetatable(self, nil)
 end
+--改 
 
+--初始化索引表
+function ObjectLayer:initIndex()
+    local objs={}
+    for k,v in pairs(self.objects) do
+       objs[tostring(v.x..":"..v.y)]=v    
+    end
+    self.objIndex=objs
+end
+--以下只支持对象层里的tile对象，因为tile对象和其它对象的坐标计算方式不一样
+--添加设置对象层是否可见，x,y为图块在地图里的横纵坐标，不是屏幕里的像素坐标
+function ObjectLayer:showObj(x,y,flag)
+  if not next(self.objIndex) then
+    self:initIndex()
+  end  
+  self.objIndex[tostring(x..":"..y)].visible=flag 
+end
+
+--给x,y的object设置属性
+function Object:set(x,y,prop,value)
+  if not next(self.objIndex) then
+    self:initIndex()
+  end 
+  self.objIndex[tostring(x..":"..y)][prop]=value
+end
+--获取x,y的obj
+function ObjectLayer:get(x,y)
+  if not next(self.objIndex) then
+    self:initIndex()
+  end
+  return self.objIndex[tostring(x..":"..y)]     
+end
+ObjectLayer.__call=ObjectLayer.get
 ---------------------------------------------------------------------------------------------------
 -- Return the ObjectLayer class
 return ObjectLayer

@@ -59,6 +59,7 @@ end
 ---------------------------------------------------------------------------------------------------
 -- Updates the draw information. Call this every time the object moves or changes size.
 function Object:updateDrawInfo()
+    -- if not self.visible then return end
     local di = self.drawInfo
     local map = self.layer.map
         
@@ -145,7 +146,6 @@ end
 ---------------------------------------------------------------------------------------------------
 -- Draw the object. The passed color is the color of the object layer the object belongs to.
 function Object:draw(x, y, r, g, b, a)
-
     if not self.visible then return end
     
     local di = self.drawInfo

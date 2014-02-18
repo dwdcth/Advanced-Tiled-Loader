@@ -63,6 +63,7 @@ function Loader.load(tofile)
     fullpath = string.gsub(fullpath, "[^/^\\]+$", "")
     
     -- Find out if the file is in the game or save directory
+
     if love.filesystem.exists(fullpath .. filename) then
     elseif love.filesystem.exists(fullpath .. filename .. ".tmx") then
         filename = filename .. ".tmx"
@@ -99,7 +100,7 @@ end
 function Loader.save(map, filename)
     local mapx = Loader._compactMap(map)
     if not love.filesystem.exists(Loader.saveDirectory) then
-        love.filesystem.mkdir(Loader.saveDirectory)
+        love.filesystem.createDirectory(Loader.saveDirectory)
     end
     love.filesystem.write( Loader.saveDirectory .. "/" .. filename, xml.table_to_string(mapx) )
 end
@@ -241,7 +242,7 @@ function Loader._expandMap(name, t)
         end
         
     end
-    
+   
     -- Return our map
     return map
 end
@@ -461,6 +462,14 @@ function Loader._expandObjectLayer(t, map)
             obj = Object:new(layer, v.xarg.name, v.xarg.type, tonumber(v.xarg.x), 
                                 tonumber(v.xarg.y), tonumber(v.xarg.width), 
                                 tonumber(v.xarg.height), tonumber(v.xarg.gid) )
+            --改
+            if v.xarg.visible~=nil then
+                if v.xarg.visible=="true" then
+                    obj.visible=true
+                else
+                    obj.visible=false
+                end
+            end
             objects[#objects+1] = obj
             for _, v2 in ipairs(v) do
             
@@ -717,7 +726,7 @@ function Loader._compactObject(object)
 
     -- <properties>
     if next(object.properties) then
-        objectx[#objectx+1] = Loader.compactProperties(object.properties)
+        objectx[#objectx+1] = Loader._compactProperties(object.properties)
     end
     
     return objectx

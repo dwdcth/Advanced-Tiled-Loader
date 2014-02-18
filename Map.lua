@@ -98,6 +98,7 @@ end
 ---------------------------------------------------------------------------------------------------
 -- Creates a new ObjectLayer and inserts it into the map
 function Map:newObjectLayer(position, ...)
+    print("objects")
     local layer = ObjectLayer:new(self, ...)
     local name = layer.name
     if self.layers[name] then 
